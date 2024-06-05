@@ -12,16 +12,15 @@ provider:
   memorySize: 1024
 
 functions:
-  telegram_frog_handler:
-    handler: telegram_messenger_frog.handler
+  readRoot:
+    handler: handler.handler
     layers:
       - Ref: PythonRequirementsLambdaLayer
     events:
       - http:
-          path: /sendMessage
+          path: /contact_form
           method: post
-          cors: true
-          authorizer: null
+
 plugins:
   - serverless-python-requirements
   - serverless-dotenv-plugin

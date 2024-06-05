@@ -7,32 +7,52 @@ import os
 
 import requests
 from dotenv import load_dotenv
+from fastapi import FastAPI
 
+# from fastapi.middleware.cors import CORSMiddleware
+from pydantic import BaseModel
+
+
+class Message(BaseModel):
+    """expected structure of incoming request"""
+
+    contact_info: str
+    message: str
+
+
+app = FastAPI()
 load_dotenv()
+
+
+# origins = ["https://janmatzek.github.io"]
+
+# app.add_middleware(
+#     CORSMiddleware,
+#     allow_origins=origins,
+#     allow_credentials=True,
+#     allow_methods=["*"],
+#     allow_headers=["*"],
+# )
 
 # TODO: refactor to FAST API
 
 
-def handler(event, context):
+@app.post("/contact_form")
+async def form_handler(message: Message):
     """
     Retrieves info from the body of an incoming API request and sends it to telegram.
     """
+    print("I'm doing something")
     # env variables
     token = os.getenv("TELEGRAM_BOT_TOKEN")
     chat_id = os.getenv("TELEGRAM_POST_BOX")
 
     # parse payload
-    print(event)
-    print(context)
-    event_body = event["body"]
-    incoming = json.loads(event_body)
+    contact_info = message.contact_info
+    incoming_message = message.message
 
-    contact_info, incoming_message = "", ""
-
-    if incoming.get("contact_info", {}):
-        contact_info = incoming.get("contact_info", {})
-    if incoming.get("message", ""):
-        incoming_message = incoming.get("message", "")
+    print(contact_info)
+    print(incoming_message)
 
     # construc outgoing message
     outgoing_message = f"""*New message from the interwebs!*
@@ -52,12 +72,13 @@ def handler(event, context):
 
     response = {
         "statusCode": status_code,
-        "headers": {
-            "Content-Type": "application/json",
-            "Access-Control-Allow-Origin": "https://janmatzek.github.io",
-            "Access-Control-Allow-Headers": "Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token,X-Amz-User-Agent",
-            "Access-Control-Allow-Methods": "OPTIONS,POST",
-        },
+        # "headers": {
+        #     "Content-Type": "application/json",
+        #     "Access-Control-Allow-Origin": "https://janmatzek.github.io",
+        #     "Access-Control-Allow-Headers": "*",
+        #     "Access-Control-Allow-Methods": "*",
+        #     "Access-Control-Allow-Credentials": "true",
+        # },
         "body": json.dumps({"message": f"{message}"}),
     }
 
