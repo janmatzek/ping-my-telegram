@@ -10,6 +10,8 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
+# TODO: refactor to FAST API
+
 
 def handler(event, context):
     """
@@ -20,13 +22,13 @@ def handler(event, context):
     chat_id = os.getenv("TELEGRAM_POST_BOX")
 
     # parse payload
+    print(event)
+    print(context)
     event_body = event["body"]
     incoming = json.loads(event_body)
 
-    sender_name, contact_info, incoming_message = "", "", ""
+    contact_info, incoming_message = "", ""
 
-    if incoming.get("sender_name", {}):
-        sender_name = incoming.get("sender_name", {})
     if incoming.get("contact_info", {}):
         contact_info = incoming.get("contact_info", {})
     if incoming.get("message", ""):
@@ -34,7 +36,6 @@ def handler(event, context):
 
     # construc outgoing message
     outgoing_message = f"""*New message from the interwebs!*
-    \n_Message from:_ {sender_name}
     \n_Reply to:_ {contact_info}
     \n_Message:_ {incoming_message}"""
 
@@ -43,6 +44,21 @@ def handler(event, context):
 
     response = requests.get(url=url, timeout=10).json()
 
-    print(response)
+    status_code = 500
+    message = "failure"
+    if response["ok"]:
+        status_code = 200
+        message = "success"
+
+    response = {
+        "statusCode": status_code,
+        "headers": {
+            "Content-Type": "application/json",
+            "Access-Control-Allow-Origin": "https://janmatzek.github.io",
+            "Access-Control-Allow-Headers": "Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token,X-Amz-User-Agent",
+            "Access-Control-Allow-Methods": "OPTIONS,POST",
+        },
+        "body": json.dumps({"message": f"{message}"}),
+    }
 
     return response

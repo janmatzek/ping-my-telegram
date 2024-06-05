@@ -10,8 +10,6 @@ provider:
   architecture: x86_64
   timeout: 30
   memorySize: 1024
-  environment:
-    GOOGLE_APPLICATION_CREDENTIALS: gcpSpotifyRunner.json
 
 functions:
   telegram_frog_handler:
@@ -45,28 +43,10 @@ custom:
 
 package:
   patterns:
-    - "!__pycache__/**"
-    - "!.vscode/**"
-    - "!venv/**"
+    - "!__pycache__"
+    - "!.serverless"
+    - "!venv"
     - "!.gitignore"
-    - "!requirements.txt"
-    - "!.git/**"
-    - "!.gitignore"
-    - "!.gitmodules"
-    - "!__pycache__/**"
-    - "!.venv/**"
-    - "!serverless/**"
-    - "!.serverless_plugins/**"
-    - "!.DS_Store"
+    - "!env"
     - "!.env"
-    - "!requirements"
-    - "!**/*.csv"
-    - "!.vscode/**"
-    - "!readme.MD"
-    - "!spotifyAuthorizationCode/**"
-    - "!accessTokenCurl.txt"
-    - "!dropTable.bqsql"
-    - "!.ipynb.checkpoints/**"
-    - "!ipynb_checkpoints/**"
-    - "!spotify/__pycache__"
-    - "!spotify/dropTable.bqsql"
+    - "telegram_messenger_frog.py"
