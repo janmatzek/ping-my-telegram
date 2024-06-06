@@ -10,8 +10,6 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-# TODO: refactor to FAST API
-
 
 def handler(event, context):
     """
@@ -21,9 +19,25 @@ def handler(event, context):
     token = os.getenv("TELEGRAM_BOT_TOKEN")
     chat_id = os.getenv("TELEGRAM_POST_BOX")
 
+    # check origin header (like an animal)
+    headers = event.get("headers", {})
+    origin = headers.get("origin", "")
+
+    if origin != "https://janmatzek.github.io":
+        response = {
+            "statusCode": 403,
+            "headers": {
+                "Content-Type": "application/json",
+                "Access-Control-Allow-Origin": "https://janmatzek.github.io",
+                "Access-Control-Allow-Credentials": True,
+                "Access-Control-Allow-Methods": "OPTIONS,POST",
+            },
+            "body": json.dumps({"message": "Not allowed"}),
+        }
+
+        return response
+
     # parse payload
-    print(event)
-    print(context)
     event_body = event["body"]
     incoming = json.loads(event_body)
 
@@ -54,8 +68,8 @@ def handler(event, context):
         "statusCode": status_code,
         "headers": {
             "Content-Type": "application/json",
-            "Access-Control-Allow-Origin": "https://janmatzek.github.io",
-            "Access-Control-Allow-Headers": "Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token,X-Amz-User-Agent",
+            "Access-Control-Allow-Origin": "*",
+            "Access-Control-Allow-Credentials": True,
             "Access-Control-Allow-Methods": "OPTIONS,POST",
         },
         "body": json.dumps({"message": f"{message}"}),

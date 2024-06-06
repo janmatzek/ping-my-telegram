@@ -18,10 +18,12 @@ functions:
       - Ref: PythonRequirementsLambdaLayer
     events:
       - http:
-          path: /sendMessage
+          path: /contact_form
           method: post
-          cors: true
+          cors:
+            origin: https://janmatzek.github.io
           authorizer: null
+
 plugins:
   - serverless-python-requirements
   - serverless-dotenv-plugin
